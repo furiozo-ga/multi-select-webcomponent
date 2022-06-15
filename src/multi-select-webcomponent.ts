@@ -65,6 +65,18 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.build();
   }
 
+  private setValuesOnConstructor(value: string | null): void {
+    if (!value) {
+      return;
+    }
+    const values = value.split(',');
+    for (const option of this.options) {
+      if (values.includes(option.value)) {
+        option.selected = true;
+      }
+    }
+  }
+
   set value(value: string[]) {
     for (const option of this.options) {
       option.selected = false;
@@ -78,18 +90,6 @@ export default class MultiselectWebcomponent extends HTMLElement {
       }
     }
     this.build();
-  }
-
-  private setValuesOnConstructor(value: string | null): void {
-    if (!value) {
-      return;
-    }
-    const values = value.split(',');
-    for (const option of this.options) {
-      if (values.includes(option.value)) {
-        option.selected = true;
-      }
-    }
   }
 
   get value(): string[] {
@@ -123,6 +123,14 @@ export default class MultiselectWebcomponent extends HTMLElement {
 
   get placeholder(): string {
     return this.getAttribute('placeholder') as string;
+  }
+
+  set name(value: string) {
+    this.setAttribute('name', value);
+  }
+
+  get name(): string {
+    return this.getAttribute('name') as string;
   }
 
   public clear(): void {
