@@ -19,7 +19,8 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.searchbox.style.flexGrow = '1';
     this.searchbox.style.border = '0';
     this.searchbox.style.outline = 'none';
-    this.searchbox.addEventListener('keyup', (e) => this.onSearchboxKeyup(e));
+    this.searchbox.addEventListener('keyup'  , (e) => this.onSearchboxKeyup(e));
+    this.searchbox.addEventListener('keydown', (e) => this.onSearchboxKeydown(e));
 
     // Selected
     this.selected.className = `msw-selected ${this.getAttribute('selected') || ''}`;
@@ -35,6 +36,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.dropdown.style.display = 'none';
     this.dropdown.style.width = '100%';
     this.dropdown.style.position = 'absolute';
+    this.dropdown.style.top = '100%';
     this.dropdown.style.zIndex = '2';
     this.dropdown.addEventListener('click', () => this.onDropdownClick());
 
@@ -42,10 +44,11 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.style.display = 'flex';
     this.style.alignItems = 'center';
     this.style.height = 'max-content';
+    this.style.position = 'relative';
     this.innerHTML = '';
     this.appendChild(this.selected);
     this.appendChild(this.buttons);
-    this.parentNode?.insertBefore(this.dropdown, this.nextSibling);
+    this.appendChild(this.dropdown);
 
     // Events
     this.addEventListener('click', () => this.onMultiselectClick());
@@ -146,6 +149,14 @@ export default class MultiselectWebcomponent extends HTMLElement {
       this.buttons.appendChild(this.buildClearButton());
     }
     this.dispatchEvent(new Event('change'));
+  }
+
+  public addOptions(...arr: any[][]): number{
+    for(let params of arr){
+      this.options.push(new Option(...params))
+    }
+    this.build()
+    return this.options.length
   }
 
   private buildSelectedItem(option: HTMLOptionElement): HTMLDivElement {
@@ -287,5 +298,19 @@ export default class MultiselectWebcomponent extends HTMLElement {
       }
     }
     this.dropdown.style.display = 'block';
+  }
+
+  private onSearchboxKeydown(e: KeyboardEvent): Boolean {
+    if (e.key === 'Backspace' && this.searchbox.value === '') {
+      let div = this.selected.querySelector('.msw-selecteditem:last-of-type') as HTMLElement
+      if (!div) return false;
+      let option=this.findOptionByValue(div.dataset.value);
+      if (!option) return false;
+      option.selected=false;
+      this.build();
+      this.searchbox.focus();
+      this.dropdown.style.display = 'block';
+    }
+    return true;
   }
 }
