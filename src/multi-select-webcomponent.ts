@@ -17,6 +17,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.searchbox.type = 'text';
     this.searchbox.className = `msw-searchbox ${this.getAttribute('searchbox') || ''}`;
     this.searchbox.style.flexGrow = '1';
+    this.searchbox.size = 1;
     this.searchbox.style.border = '0';
     this.searchbox.style.outline = 'none';
     this.searchbox.addEventListener('keyup'  , (e) => this.onSearchboxKeyup(e));
