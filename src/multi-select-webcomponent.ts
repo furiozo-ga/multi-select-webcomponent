@@ -38,7 +38,6 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.dropdown.style.position = 'absolute';
     this.dropdown.style.top = '100%';
     this.dropdown.style.zIndex = '2';
-    this.dropdown.addEventListener('click', () => this.onDropdownClick());
 
     // Structure
     this.style.display = 'flex';
@@ -51,8 +50,9 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.appendChild(this.dropdown);
 
     // Events
-    this.addEventListener('click', () => this.onMultiselectClick());
-    this.parentElement?.addEventListener('mouseleave', () => this.dropdown.style.display = 'none');
+    this.addEventListener('click', e => this.searchbox.focus());
+    this.addEventListener('mousedown', (e) => this.onMultiselectClick(e));
+    this.addEventListener('focusout', this.focusout);
 
     // Attributes
     this.searchbox.placeholder = this.getAttribute('placeholder') || '';
@@ -275,13 +275,10 @@ export default class MultiselectWebcomponent extends HTMLElement {
     e.stopPropagation();
   }
 
-  private onMultiselectClick(): void {
+  private onMultiselectClick(e: Event): void {
+    e.preventDefault();
     if (this.disabled === true) return;
     this.dropdown.style.display = 'block';
-    this.searchbox.focus();
-  }
-
-  private onDropdownClick(): void {
     this.searchbox.focus();
   }
 
@@ -320,5 +317,10 @@ export default class MultiselectWebcomponent extends HTMLElement {
       this.dropdown.style.display = 'block';
     }
     return true;
+  }
+
+  private focusout(e: Event){
+    this.dropdown.style.display = 'none';
+    this.searchbox.value=''
   }
 }
