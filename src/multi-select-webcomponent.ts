@@ -35,7 +35,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
     // Dropdown
     this.dropdown.className = `msw-dropdown ${this.getAttribute('dropdown') || ''}`;
     this.dropdown.style.display = 'none';
-    this.dropdown.style.width = '100%';
+    this.dropdown.style.minWidth = '100%';
     this.dropdown.style.position = 'absolute';
     this.dropdown.style.top = '100%';
     this.dropdown.style.zIndex = '2';
@@ -43,7 +43,8 @@ export default class MultiselectWebcomponent extends HTMLElement {
     // Structure
     this.style.display = 'flex';
     this.style.alignItems = 'center';
-    this.style.height = 'max-content';
+    this.style.height   = 'max-content';
+    this.style.maxWidth = 'min-content';
     this.style.position = 'relative';
     this.innerHTML = '';
     this.appendChild(this.selected);
