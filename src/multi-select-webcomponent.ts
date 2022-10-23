@@ -80,16 +80,9 @@ export default class MultiselectWebcomponent extends HTMLElement {
   }
 
   set value(value: string[]) {
+    value ||= [];
     for (const option of this.options) {
-      option.selected = false;
-    }
-    if (!value || value.length == 0) {
-      return;
-    }
-    for (const option of this.options) {
-      if (value.includes(option.value)) {
-        option.selected = true;
-      }
+        option.selected = value.some( el => el == option.value );
     }
     this.build();
   }
