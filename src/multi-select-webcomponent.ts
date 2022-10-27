@@ -6,12 +6,15 @@ export default class MultiselectWebcomponent extends HTMLElement {
   selected: HTMLDivElement = document.createElement('div');
   buttons: HTMLDivElement = document.createElement('div');
 
+  numericValues: boolean;
+
   constructor() {
     super();
 
     // Keeping options
     this.querySelectorAll('option').forEach(option => this.options.push(option.cloneNode(true) as HTMLOptionElement));
     this.setValuesOnConstructor(this.getAttribute('value'));
+    this.numericValues = this.getAttribute('numeric-values') != null
 
     // Search input
     this.searchbox.type = 'text';
@@ -87,11 +90,11 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.build();
   }
 
-  get value(): string[] {
+  get value(): any[] {
     const ret = [];
     for (const option of this.options) {
       if (option.selected) {
-        ret.push(option.value);
+        ret.push( this.numericValues ? parseFloat(option.value) : option.value );
       }
     }
     return ret;
