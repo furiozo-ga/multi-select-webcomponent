@@ -1,12 +1,13 @@
 export default class MultiselectWebcomponent extends HTMLElement {
 
-  options: HTMLOptionElement[] = [];
-  searchbox: HTMLInputElement = document.createElement('input');
-  dropdown: HTMLDivElement = document.createElement('div');
-  selected: HTMLDivElement = document.createElement('div');
-  buttons: HTMLDivElement = document.createElement('div');
+  options:   HTMLOptionElement[] = [];
+  searchbox: HTMLInputElement    = document.createElement('input');
+  dropdown:  HTMLDivElement      = document.createElement('div');
+  selected:  HTMLDivElement      = document.createElement('div');
+  buttons:   HTMLDivElement      = document.createElement('div');
 
   numericValues: boolean;
+  singular: boolean;
 
   constructor() {
     super();
@@ -14,7 +15,8 @@ export default class MultiselectWebcomponent extends HTMLElement {
     // Keeping options
     this.querySelectorAll('option').forEach(option => this.options.push(option.cloneNode(true) as HTMLOptionElement));
     this.setValuesOnConstructor(this.getAttribute('value'));
-    this.numericValues = this.getAttribute('numeric-values') != null
+    this.numericValues = (this.getAttribute('numeric-values')??'false') != 'false'
+    this.singular      = (this.getAttribute('singular')      ??'false') != 'false'
 
     // Search input
     this.searchbox.type = 'text';
@@ -47,7 +49,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.style.display = 'flex';
     this.style.alignItems = 'center';
     this.style.height   = 'max-content';
-    this.style.maxWidth = 'min-content';
+    this.style.maxWidth = this.singular?'max-content':'min-content';
     this.style.position = 'relative';
     this.innerHTML = '';
     this.appendChild(this.selected);
@@ -148,6 +150,10 @@ export default class MultiselectWebcomponent extends HTMLElement {
       }
     }
     this.selected.appendChild(this.searchbox);
+    //workaround button to capture Enter key press events so they are not sent to selectall/clearall
+    let honeypot = document.createElement('button');
+    honeypot.style.display='none'
+    this.buttons.appendChild(honeypot)
     if (this.dropdown.innerHTML !== '') {
       this.buttons.appendChild(this.buildSelectAllButton());
     }
@@ -237,6 +243,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
   }
 
   private chooseOption(option: HTMLOptionElement | undefined): void {
+    if (this.singular) this.options.forEach(option => option.selected = false);
     if (option) {
       option.selected = true;
     }
