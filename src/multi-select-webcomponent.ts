@@ -8,6 +8,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
 
   numericValues: boolean;
   singular: boolean;
+  dblclkclear: boolean;
 
   constructor() {
     super();
@@ -17,6 +18,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
     this.setValuesOnConstructor(this.getAttribute('value'));
     this.numericValues = (this.getAttribute('numeric-values')??'false') != 'false'
     this.singular      = (this.getAttribute('singular')      ??'false') != 'false'
+    this.dblclkclear   = (this.getAttribute('dblclkclear')   ??'false') != 'false'
 
     // Search input
     this.searchbox.type = 'text';
@@ -85,7 +87,8 @@ export default class MultiselectWebcomponent extends HTMLElement {
   }
 
   set value(value: string[]) {
-    value ||= [];
+    value ??= [];
+    Array.isArray(value) || (value = [value]);
     for (const option of this.options) {
         option.selected = value.some( el => el == option.value );
     }
@@ -179,7 +182,17 @@ export default class MultiselectWebcomponent extends HTMLElement {
     item.innerHTML = option.textContent as string;
     item.dataset.value = option.value;
     if (!this.disabled) {
-      item.addEventListener('click', (e) => this.onSelectedClick(e));
+      if(this.dblclkclear){
+        item.addEventListener('dblclick', (e) => {
+          this.onSelectedClick(e);
+          if(this.singular){
+            this.focusout(e);
+            this.searchbox.blur();
+          }
+        });
+      }else{
+        item.addEventListener('click', (e) => this.onSelectedClick(e));
+      }
     }
     return item;
   }
@@ -253,6 +266,11 @@ export default class MultiselectWebcomponent extends HTMLElement {
 
   private onItemClick(e: Event): void {
     this.chooseOption(this.findOptionByValue((e.currentTarget as HTMLElement).dataset.value));
+    if(this.singular){
+      e.cancelBubble=true;
+      this.focusout(e);
+      this.searchbox.blur();
+    }
   }
 
   private onSelectedClick(e: Event): void {
@@ -261,6 +279,7 @@ export default class MultiselectWebcomponent extends HTMLElement {
       option.selected = false;
     }
     this.build();
+    this.searchbox.focus()
   }
 
   private onClearClick(e: Event): void {
